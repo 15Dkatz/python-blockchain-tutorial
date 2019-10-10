@@ -20,7 +20,7 @@ def main():
     blockchain.add_block('two')
 
     print(blockchain)
-    print(f'blockchain.py __name__: {__name__}')
+    print(f'blockchain.py ___name__: {__name__}')
 
 if __name__ == '__main__':
     main()
