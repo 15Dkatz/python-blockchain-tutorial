@@ -1,2 +1,3 @@
 pytest==5.1.2
 Flask==1.1.1
+pubnub==4.1.6

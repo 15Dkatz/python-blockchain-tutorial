@@ -1,0 +1,3 @@
+pycryptodomex>=3.3
+requests>=2.4
+six>=1.10
