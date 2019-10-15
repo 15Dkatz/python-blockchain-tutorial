@@ -42,3 +42,7 @@ a, a:hover {
   color: #e66;
   text-decoration: underline;
 }
+
+input, button {
+  color: black;
+}
