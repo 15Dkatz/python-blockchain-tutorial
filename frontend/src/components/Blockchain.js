@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { API_BASE_URL } from '../config';
 import Block from './Block';
@@ -30,6 +31,8 @@ function Blockchain() {
 
   return (
     <div className="Blockchain">
+      <Link to='/'>Home</Link>
+      <hr />
       <h3>Blockchain</h3>
       <div>
         {
