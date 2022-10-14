@@ -3,7 +3,7 @@ import time
 
 from backend.wallet.wallet import Wallet
 
-BASE_URL = 'http://localhost:5000'
+BASE_URL = 'http://127.0.0.1:5000'
 
 def get_blockchain():
     return requests.get(f'{BASE_URL}/blockchain').json()
@@ -11,7 +11,7 @@ def get_blockchain():
 def get_blockchain_mine():
     return requests.get(f'{BASE_URL}/blockchain/mine').json()   
 
-def post_wallet_transact(recipient, amount): 
+def post_wallet_transact(recipient, amount):
     return requests.post(
         f'{BASE_URL}/wallet/transact',
         json={ 'recipient': recipient, 'amount': amount }
