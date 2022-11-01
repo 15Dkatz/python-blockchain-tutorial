@@ -68,6 +68,7 @@ def route_wallet_transact():
         )
 
     pubsub.broadcast_transaction(transaction)
+    transaction_pool.set_transaction(transaction)
 
     return jsonify(transaction.to_json())
 
