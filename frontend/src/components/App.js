@@ -7,6 +7,7 @@ function App() {
   const [walletInfo, setWalletInfo] = useState({});
 
   useEffect(() => {
+    console.log(`API_BASE_URL`, API_BASE_URL);
     fetch(`${API_BASE_URL}/wallet/info`)
       .then(response => response.json())
       .then(json => setWalletInfo(json));
