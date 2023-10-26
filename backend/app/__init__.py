@@ -16,7 +16,7 @@ CORS(app, resources={ r'/*': { 'origins': 'http://localhost:3000' } })
 blockchain = Blockchain()
 wallet = Wallet(blockchain)
 transaction_pool = TransactionPool()
-pubsub = PubSub(blockchain, transaction_pool)
+pubsub = PubSub(blockchain, transaction_pool, wallet)
 
 @app.route('/')
 def route_default():

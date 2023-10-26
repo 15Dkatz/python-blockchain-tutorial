@@ -19,7 +19,8 @@ class Wallet:
     """
     def __init__(self, blockchain=None):
         self.blockchain = blockchain
-        self.address = str(uuid.uuid4())[0:8]
+        self.id = str(uuid.uuid4())
+        self.address = self.id[0:8]
         self.private_key = ec.generate_private_key(
             ec.SECP256K1(),
             default_backend()

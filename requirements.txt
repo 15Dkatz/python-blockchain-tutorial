@@ -1,6 +1,6 @@
 pytest==5.1.2
 Flask==1.1.1
-pubnub==4.1.6
+pubnub==7.3.0
 requests==2.22.0
 cryptography==2.7
 Flask-Cors==3.0.8

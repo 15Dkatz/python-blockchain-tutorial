@@ -48,7 +48,8 @@ class PubSub():
     Handles the publish/subscribe layer of the application.
     Provides communication between the nodes of the blockchain network.
     """
-    def __init__(self, blockchain, transaction_pool):
+    def __init__(self, blockchain, transaction_pool, wallet):
+        pnconfig.user_id = wallet.id
         self.pubnub = PubNub(pnconfig)
         self.pubnub.subscribe().channels(CHANNELS.values()).execute()
         self.pubnub.add_listener(Listener(blockchain, transaction_pool))
