@@ -1,3 +1,4 @@
+## An amazing project on Blockchain and Crypto
 ## Python, JS, & React | Build a Blockchain & Cryptocurrency
 
 ![Course Logo](python_blockchain_logo.png)
