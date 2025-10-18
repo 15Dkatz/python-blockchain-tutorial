@@ -8,8 +8,10 @@ from backend.blockchain.block import Block
 from backend.wallet.transaction import Transaction
 
 pnconfig = PNConfiguration()
-pnconfig.subscribe_key = 'sub-c-666638f6-ec63-11e9-b715-9abbdb5d0da2'
-pnconfig.publish_key = 'pub-c-82bf7695-ce5e-4bc5-9cd9-a8f8147dc2a8'
+# NOTE: these keys have been retired.
+pnconfig.subscribe_key = 'sub-c-448d1fb4-5f47-4e56-a496-e4588e0808a7'
+pnconfig.publish_key = 'pub-c-691add7b-2cc0-42c8-96f9-7edf786b5b4b'
+pnconfig.user_id = 'test-1'
 
 CHANNELS = {
     'TEST': 'TEST',
@@ -32,9 +34,11 @@ class Listener(SubscribeCallback):
 
             try:
                 self.blockchain.replace_chain(potential_chain)
+
                 self.transaction_pool.clear_blockchain_transactions(
                     self.blockchain
                 )
+
                 print('\n -- Successfully replaced the local chain')
             except Exception as e:
                 print(f'\n -- Did not replace chain: {e}')
@@ -57,9 +61,7 @@ class PubSub():
         """
         Publish the message object to the channel.
         """
-        self.pubnub.unsubscribe().channels([channel]).execute()
         self.pubnub.publish().channel(channel).message(message).sync()
-        self.pubnub.subscribe().channels([channel]).execute()
 
     def broadcast_block(self, block):
         """
