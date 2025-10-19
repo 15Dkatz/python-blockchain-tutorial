@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FormGroup, FormControl, Button } from 'react-bootstrap';
 import { API_BASE_URL } from '../config';
-import history from '../history';
 
 function ConductTransaction() {
+  const navigate = useNavigate();
   const [amount, setAmount] = useState(0);
   const [recipient, setRecipient] = useState('');
   const [knownAddresses, setKnownAddresses] = useState([]);
@@ -34,7 +34,7 @@ function ConductTransaction() {
 
         alert('Success!');
 
-        history.push('/transaction-pool');
+        navigate('/transaction-pool');
       });
   }
 

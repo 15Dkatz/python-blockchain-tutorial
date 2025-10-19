@@ -1,21 +1,20 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Router, Switch, Route } from 'react-router-dom';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
-import history from './history';
 import App from './components/App';
 import Blockchain from './components/Blockchain';
 import ConductTransaction from './components/ConductTransaction';
 import TransactionPool from './components/TransactionPool';
 
-ReactDOM.render(
-  <Router history={history}>
-    <Switch>
-      <Route path='/' exact component={App} />
-      <Route path='/blockchain' component={Blockchain} />
-      <Route path='/conduct-transaction' component={ConductTransaction} />
-      <Route path='/transaction-pool' component={TransactionPool} />
-    </Switch>
-  </Router>,
-  document.getElementById('root')
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <BrowserRouter>
+    <Routes>
+      <Route path='/' element={<App />} />
+      <Route path='/blockchain' element={<Blockchain />} />
+      <Route path='/conduct-transaction' element={<ConductTransaction />} />
+      <Route path='/transaction-pool' element={<TransactionPool />} />
+    </Routes>
+  </BrowserRouter>
 );
