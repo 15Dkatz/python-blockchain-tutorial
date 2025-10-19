@@ -40,12 +40,12 @@ case "$(uname)" in
     CYGWIN*|MSYS*)
         # transform D:\path\to\venv to /d/path/to/venv on MSYS
         # and to /cygdrive/d/path/to/venv on Cygwin
-        VIRTUAL_ENV=$(cygpath "/Users/dk/Code/python-blockchain-q4-2025-audit/blockchain-env")
+        VIRTUAL_ENV=$(cygpath "/Users/dk/Code/python-blockchain-tutorial/blockchain-env")
         export VIRTUAL_ENV
         ;;
     *)
         # use the path as-is
-        export VIRTUAL_ENV="/Users/dk/Code/python-blockchain-q4-2025-audit/blockchain-env"
+        export VIRTUAL_ENV="/Users/dk/Code/python-blockchain-tutorial/blockchain-env"
         ;;
 esac
 
