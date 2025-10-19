@@ -4,3 +4,5 @@
 blockchain-env/lib/python3.7
 *.DS_Store*
 
+backend/.env
+

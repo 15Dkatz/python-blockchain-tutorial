@@ -1,6 +1,12 @@
 import os
 import requests
 import random
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables FIRST, before any other backend imports
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS

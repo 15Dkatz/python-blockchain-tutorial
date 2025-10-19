@@ -1,3 +1,4 @@
+import os
 import time
 
 from pubnub.pubnub import PubNub
@@ -8,10 +9,9 @@ from backend.blockchain.block import Block
 from backend.wallet.transaction import Transaction
 
 pnconfig = PNConfiguration()
-# NOTE: these keys have been retired.
-pnconfig.subscribe_key = 'sub-c-448d1fb4-5f47-4e56-a496-e4588e0808a7'
-pnconfig.publish_key = 'pub-c-691add7b-2cc0-42c8-96f9-7edf786b5b4b'
-pnconfig.user_id = 'test-1'
+pnconfig.publish_key = os.environ.get('PUBNUB_PUBLISH_KEY')
+pnconfig.subscribe_key = os.environ.get('PUBNUB_SUBSCRIBE_KEY')
+pnconfig.user_id = os.environ.get('PUBNUB_USER_ID', 'blockchain-node-default')
 
 CHANNELS = {
     'TEST': 'TEST',

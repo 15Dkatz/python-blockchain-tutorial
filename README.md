@@ -79,9 +79,10 @@ python3 -m backend.app
 **Run a peer instance**
 
 Make sure to activate the virtual environment.
+Choose a unique PUBNUB_USER_ID per peer.
 
 ```
-export PEER=True && python3 -m backend.app
+export PEER=True && export PUBNUB_USER_ID=blockchain-peer-1 && python3 -m backend.app
 ```
 
 **Run the frontend**
@@ -98,3 +99,12 @@ Make sure to activate the virtual environment.
 ```
 export SEED_DATA=True && python3 -m backend.app
 ```
+
+** PubNub Configuration**
+
+This application uses PubNub for real-time peer-to-peer communication between blockchain nodes. **You must configure PubNub to run the application.**
+
+**See [PUBNUB_CONFIG.md](PUBNUB_CONFIG.md) for detailed setup instructions.**
+
+1. Get free PubNub keys at [https://www.pubnub.com/](https://www.pubnub.com/)
+2. copy `backend/env.example` to `backend/.env` and configure it with your keys.
