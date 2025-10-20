@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5050';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5050';
 const NANOSECONDS_PY = 1;
 const MICROSECONDS_PY = 1000 * NANOSECONDS_PY;
 const MILLISECONDS_PY = 1000 * MICROSECONDS_PY;

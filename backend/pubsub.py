@@ -1,11 +1,13 @@
 import os
 import time
+import requests
 
 from pubnub.pubnub import PubNub
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.callbacks import SubscribeCallback
 
 from backend.blockchain.block import Block
+from backend.blockchain.blockchain import Blockchain
 from backend.wallet.transaction import Transaction
 
 pnconfig = PNConfiguration()
@@ -42,10 +44,38 @@ class Listener(SubscribeCallback):
                 print('\n -- Successfully replaced the local chain')
             except Exception as e:
                 print(f'\n -- Did not replace chain: {e}')
+
+                # If we can't validate the block, try to sync the full blockchain
+                # This handles cases where we're missing previous blocks
+                self.sync_blockchain()
+
         elif message_object.channel == CHANNELS['TRANSACTION']:
             transaction = Transaction.from_json(message_object.message)
             self.transaction_pool.set_transaction(transaction)
             print('\n -- Set the new transaction in the transaction pool')
+    
+    def sync_blockchain(self):
+        """
+        Synchronize the local blockchain with the root node.
+        This is called when we receive a block we can't validate.
+        """
+        try:
+            # Get the root backend host (main node)
+            root_host = os.environ.get('ROOT_BACKEND_HOST', 'localhost')
+            root_port = os.environ.get('ROOT_PORT', '5050')
+
+            print(f'\n -- Attempting to sync blockchain from {root_host}:{root_port}')
+
+            # Request the full blockchain from the root node
+            response = requests.get(f'http://{root_host}:{root_port}/blockchain')
+            result_blockchain = Blockchain.from_json(response.json())
+
+            # Replace our local chain with the synchronized chain
+            self.blockchain.replace_chain(result_blockchain.chain)
+
+            print(f'\n -- Successfully synchronized! Chain length: {len(self.blockchain.chain)}')
+        except Exception as e:
+            print(f'\n -- Could not synchronize blockchain: {e}')
 
 class PubSub():
     """
@@ -61,7 +91,11 @@ class PubSub():
         """
         Publish the message object to the channel.
         """
-        self.pubnub.publish().channel(channel).message(message).sync()
+        try:
+            result = self.pubnub.publish().channel(channel).message(message).sync()
+            print(f'\n-- Published to {channel}: {result.status.is_error()}')
+        except Exception as e:
+            print(f'\n-- Error publishing to {channel}: {e}')
 
     def broadcast_block(self, block):
         """
