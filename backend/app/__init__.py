@@ -8,8 +8,9 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
+import json
 
 from backend.blockchain.blockchain import Blockchain
 from backend.wallet.wallet import Wallet
@@ -19,6 +20,18 @@ from backend.pubsub import PubSub
 
 app = Flask(__name__)
 CORS(app, resources={ r'/*': { 'origins': 'http://localhost:3000' } })
+
+def json_response(data, status=200):
+    """
+    Create a JSON response that preserves large integers.
+    Flask's default jsonify converts large ints to floats, which breaks
+    cryptographic signatures. This function ensures integers are preserved.
+    """
+    return Response(
+        json.dumps(data, separators=(',', ':')),
+        status=status,
+        mimetype='application/json'
+    )
 blockchain = Blockchain()
 wallet = Wallet(blockchain)
 transaction_pool = TransactionPool()
@@ -30,7 +43,7 @@ def route_default():
 
 @app.route('/blockchain')
 def route_blockchain():
-    return jsonify(blockchain.to_json())
+    return json_response(blockchain.to_json())
 
 @app.route('/blockchain/range')
 def route_blockchain_range():
@@ -53,7 +66,7 @@ def route_blockchain_mine():
     pubsub.broadcast_block(block)
     transaction_pool.clear_blockchain_transactions(blockchain)
 
-    return jsonify(block.to_json())
+    return json_response(block.to_json())
 
 @app.route('/wallet/transact', methods=['POST'])
 def route_wallet_transact():
@@ -102,7 +115,9 @@ PORT = ROOT_PORT
 if os.environ.get('PEER') == 'True':
     PORT = random.randint(5051, 6000)
 
-    result = requests.get(f'http://localhost:{ROOT_PORT}/blockchain')
+    # In Docker, use service name instead of localhost
+    ROOT_HOST = os.environ.get('ROOT_BACKEND_HOST', 'localhost')
+    result = requests.get(f'http://{ROOT_HOST}:{ROOT_PORT}/blockchain')
     result_blockchain = Blockchain.from_json(result.json())
 
     try:
@@ -119,9 +134,10 @@ if os.environ.get('SEED_DATA') == 'True':
         ])
 
     for i in range(3):
-        transaction_pool.set_transaction(
-            Transaction(Wallet(), Wallet().address, random.randint(2, 50))
-        )
+        transaction = Transaction(Wallet(), Wallet().address, random.randint(2, 50))
+        pubsub.broadcast_transaction(transaction)
+        transaction_pool.set_transaction(transaction)
 
-app.run(port=PORT)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=PORT, debug=True)
 
