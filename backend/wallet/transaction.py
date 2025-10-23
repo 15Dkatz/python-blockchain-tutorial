@@ -69,16 +69,13 @@ class Transaction:
 
         self.input = self.create_input(sender_wallet, self.output)
 
-    # TODO: consider making my own python library for this, to clean it up for the student.
-    # That, or clone from the course repo.
     def to_json(self):
         """
         Serialize the transaction.
         Convert large signature integers to strings to prevent float conversion in JSON.
         """
         transaction_dict = self.__dict__.copy()
-        
-        # If this transaction has a signature (not a mining reward), convert it to strings
+
         if self.input != None and isinstance(self.input, dict) and 'signature' in self.input:
             transaction_dict = {
                 'id': self.id,
