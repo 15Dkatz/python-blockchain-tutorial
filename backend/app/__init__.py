@@ -1,6 +1,7 @@
 import os
 import requests
 import random
+import threading
 import time
 from pathlib import Path
 from dotenv import load_dotenv
@@ -139,18 +140,27 @@ if os.environ.get('SEED_DATA') == 'True':
         pubsub.broadcast_transaction(transaction)
         transaction_pool.set_transaction(transaction)
 
-if os.environ.get('POLL_ROOT') == 'True':
+def poll_root_blockchain():
     poll_interval = int(os.environ.get('POLL_INTERVAL', '15'))
+    root_host = os.environ.get('ROOT_HOST', 'localhost')
+
+    print(f'\n -- Starting polling thread for {root_host}:{ROOT_PORT} every {poll_interval}s')
 
     while True:
         try:
             result = requests.get(f'http://{root_host}:{ROOT_PORT}/blockchain')
             result_blockchain = Blockchain.from_json(result.json())
             blockchain.replace_chain(result_blockchain.chain)
+            print(f'\n -- Successfully polled blockchain from {root_host}')
         except Exception as e:
             print(f'\n -- Error polling root blockchain: {e}')
         
         time.sleep(poll_interval)
+
+if os.environ.get('POLL_ROOT') == 'True':
+    # Start polling in a background daemon thread so it doesn't block Flask
+    polling_thread = threading.Thread(target=poll_root_blockchain, daemon=True)
+    polling_thread.start()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=PORT, debug=True)
