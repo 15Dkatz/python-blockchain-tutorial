@@ -1,6 +1,7 @@
 import os
 import requests
 import random
+import time
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -111,13 +112,13 @@ def route_transactions():
 
 ROOT_PORT = 5050
 PORT = ROOT_PORT
+# In Docker, use service name supplied by an env variable instead of localhost
+root_host = os.environ.get('ROOT_HOST', 'localhost')
 
 if os.environ.get('PEER') == 'True':
     PORT = random.randint(5051, 6000)
 
-    # In Docker, use service name instead of localhost
-    ROOT_HOST = os.environ.get('ROOT_BACKEND_HOST', 'localhost')
-    result = requests.get(f'http://{ROOT_HOST}:{ROOT_PORT}/blockchain')
+    result = requests.get(f'http://{root_host}:{ROOT_PORT}/blockchain')
     result_blockchain = Blockchain.from_json(result.json())
 
     try:
@@ -137,6 +138,19 @@ if os.environ.get('SEED_DATA') == 'True':
         transaction = Transaction(Wallet(), Wallet().address, random.randint(2, 50))
         pubsub.broadcast_transaction(transaction)
         transaction_pool.set_transaction(transaction)
+
+if os.environ.get('POLL_ROOT') == 'True':
+    poll_interval = int(os.environ.get('POLL_INTERVAL', '15'))
+
+    while True:
+        try:
+            result = requests.get(f'http://{root_host}:{ROOT_PORT}/blockchain')
+            result_blockchain = Blockchain.from_json(result.json())
+            blockchain.replace_chain(result_blockchain.chain)
+        except Exception as e:
+            print(f'\n -- Error polling root blockchain: {e}')
+        
+        time.sleep(poll_interval)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=PORT, debug=True)
