@@ -142,9 +142,11 @@ if os.environ.get('SEED_DATA') == 'True':
 
 def poll_root_blockchain():
     """
-    Poll the root blockchain every 15 seconds and attempt to sync.
+    Poll the root blockchain at specified intervals and attempt to sync.
     This runs in a background thread when POLL_ROOT environment variable is True.
     """
+    poll_interval = int(os.environ.get('POLL_INTERVAL', '15'))
+    
     while True:
         try:
             # Get the root host from environment, fallback to localhost
@@ -167,14 +169,15 @@ def poll_root_blockchain():
         except Exception as e:
             print(f'\n -- Error synchronizing with root blockchain: {e}')
         
-        # Wait 15 seconds before next poll
-        time.sleep(15)
+        # Wait for the configured interval before next poll
+        time.sleep(poll_interval)
 
 if os.environ.get('POLL_ROOT') == 'True':
     # Start the polling thread
     poll_thread = threading.Thread(target=poll_root_blockchain, daemon=True)
     poll_thread.start()
-    print('\n -- Started polling root blockchain every 15 seconds')
+    poll_interval = os.environ.get('POLL_INTERVAL', '15')
+    print(f'\n -- Started polling root blockchain every {poll_interval} seconds')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=PORT, debug=True)
