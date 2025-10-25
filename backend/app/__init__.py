@@ -1,6 +1,8 @@
 import os
 import requests
 import random
+import threading
+import time
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -137,6 +139,42 @@ if os.environ.get('SEED_DATA') == 'True':
         transaction = Transaction(Wallet(), Wallet().address, random.randint(2, 50))
         pubsub.broadcast_transaction(transaction)
         transaction_pool.set_transaction(transaction)
+
+def poll_root_blockchain():
+    """
+    Poll the root blockchain every 15 seconds and attempt to sync.
+    This runs in a background thread when POLL_ROOT environment variable is True.
+    """
+    while True:
+        try:
+            # Get the root host from environment, fallback to localhost
+            root_host = os.environ.get('ROOT_BACKEND_HOST', 'localhost')
+            root_port = ROOT_PORT
+            
+            # Fetch blockchain from root host
+            response = requests.get(f'http://{root_host}:{root_port}/blockchain', timeout=10)
+            response.raise_for_status()
+            
+            # Parse the blockchain
+            result_blockchain = Blockchain.from_json(response.json())
+            
+            # Attempt to replace the local chain with the root chain
+            blockchain.replace_chain(result_blockchain.chain)
+            print(f'\n -- Successfully synchronized with root blockchain at {root_host}:{root_port}')
+            
+        except requests.exceptions.RequestException as e:
+            print(f'\n -- Error fetching blockchain from root: {e}')
+        except Exception as e:
+            print(f'\n -- Error synchronizing with root blockchain: {e}')
+        
+        # Wait 15 seconds before next poll
+        time.sleep(15)
+
+if os.environ.get('POLL_ROOT') == 'True':
+    # Start the polling thread
+    poll_thread = threading.Thread(target=poll_root_blockchain, daemon=True)
+    poll_thread.start()
+    print('\n -- Started polling root blockchain every 15 seconds')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=PORT, debug=True)
