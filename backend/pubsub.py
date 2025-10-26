@@ -61,7 +61,7 @@ class Listener(SubscribeCallback):
         """
         try:
             # Get the root backend host (main node)
-            root_host = os.environ.get('ROOT_BACKEND_HOST', 'localhost')
+            root_host = os.environ.get('ROOT_HOST', 'localhost')
             root_port = os.environ.get('ROOT_PORT', '5050')
 
             print(f'\n -- Attempting to sync blockchain from {root_host}:{root_port}')
